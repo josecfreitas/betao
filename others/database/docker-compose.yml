@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  pg-database:
+    image: postgres
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "123"
+      POSTGRES_DB: "betao"
+    ports:
+      - 5432:5432
+    volumes:
+      - pg-database:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "josecfreitas@outlook.com.br"
+      PGADMIN_DEFAULT_PASSWORD: "123"
+    ports:
+      - 54321:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    depends_on:
+      - pg-database
+
+volumes:
+  pg-database:
+  pgadmin:
+
+networks:
+  default:
+    driver: bridge

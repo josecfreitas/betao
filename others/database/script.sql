@@ -86,7 +86,8 @@ CREATE TABLE bet(
   player_id uuid NOT NULL REFERENCES player(id),
   game_id uuid NOT NULL REFERENCES game(id),
   price REAL NOT NULL,
-  quantity INT NOT NULL
+  quantity INT NOT NULL,
+  hits INT
 );
 
 INSERT INTO
@@ -195,7 +196,7 @@ SELECT
   ) AS matches,
   array_agg(game_match.result) AS game_results,
   array_agg(bet_match.result) AS bet_results,
-  array_agg(game_match.result = bet_match.result) AS hits,
+  array_agg(game_match.result = bet_match.result) AS hits_agg,
   count(1) FILTER (
     WHERE
       game_match.result = bet_match.result
@@ -226,4 +227,30 @@ FROM
   JOIN game_matches_agg ON (bet.game_id = game_matches_agg.id)
   JOIN bet_matches_agg ON (bet.id = bet_matches_agg.id)
 ORDER BY
-  hits_count DESC
+  hits_count DESC;
+
+-- Update bet with results
+UPDATE
+  bet
+SET
+  hits = hits_query.hits_count
+FROM
+  (
+    SELECT
+      bet.id AS bet_id,
+      count(1) FILTER (
+        WHERE
+          game_match.result = bet_match.result
+      ) AS hits_count
+    FROM
+      bet
+      JOIN bet_match ON (bet.id = bet_match.bet_id)
+      JOIN game_match ON (bet_match.game_match_id = game_match.id)
+    WHERE
+      bet.hits is null
+      AND game_match.result is not null
+    GROUP BY
+      bet.id
+  ) AS hits_query
+WHERE
+  hits_query.bet_id = bet.id

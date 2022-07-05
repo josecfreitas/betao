@@ -87,7 +87,8 @@ CREATE TABLE bet(
   game_id uuid NOT NULL REFERENCES game(id),
   price REAL NOT NULL,
   quantity INT NOT NULL,
-  hits INT
+  hits INT,
+  game_matches_count INT
 );
 
 INSERT INTO
@@ -233,7 +234,8 @@ ORDER BY
 UPDATE
   bet
 SET
-  hits = hits_query.hits_count
+  hits = hits_query.hits_count,
+  game_matches_count = hits_query.game_matches_count
 FROM
   (
     SELECT
@@ -241,7 +243,8 @@ FROM
       count(1) FILTER (
         WHERE
           game_match.result = bet_match.result
-      ) AS hits_count
+      ) AS hits_count,
+      count(1) AS game_matches_count
     FROM
       bet
       JOIN bet_match ON (bet.id = bet_match.bet_id)

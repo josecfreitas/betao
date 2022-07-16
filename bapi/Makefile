@@ -6,6 +6,16 @@ GOTESTCMD := go test -race
 help: Makefile
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 
+## dev: Start the app in development mode
+.PHONY: dev
+dev:
+	air
+
+## start: Start the app in production mode
+.PHONY: start
+start:
+	go run ./cmd/app/main.go
+
 ## test: Run all tests
 .PHONY: test test/unit cover/unit
 test: test/unit

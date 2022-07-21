@@ -1,8 +1,11 @@
 package game
 
-import "time"
+import (
+	"time"
+)
 
 type Game struct {
+	Id                         int
 	Name                       string
 	BetPrice                   float64
 	StartsAt                   time.Time

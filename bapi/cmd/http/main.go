@@ -8,7 +8,10 @@ import (
 func handleRequests() {
 	r := gin.Default()
 
-	game.GameController(r.Group("games"))
+	gameRepository := game.NewGameRepository()
+	gameService := game.NewGameService(gameRepository)
+	gameController := game.NewGameController(gameService)
+	gameController.HandleRequests(r.Group("games"))
 
 	r.Run(":3000")
 }
